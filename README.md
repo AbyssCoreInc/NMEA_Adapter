@@ -1,4 +1,4 @@
-#NMEA0183 - Fiware Adapter
+# NMEA0183 - Fiware Adapter
 
 Purpose of this piece of software is to capture NMEA0183 traffic using serial adapter like that by Brookhouse and
 inject that Fiware using MQTT Ultra Light protocoll. Datamodel for NMEA0183 devices is somethign that is crucial and 
