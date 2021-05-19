@@ -21,7 +21,7 @@ public:
 	NMEA_Adapter(std::string path);
 	int readConfigFile(std::string path);
 	int openUSBSerialPort();
-	int readSentence();
+	std::string readSentence();
 	unsigned int strToInt(const char *str, int base);
 	int cleanUp();
 };

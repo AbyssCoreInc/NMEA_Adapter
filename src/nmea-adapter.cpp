@@ -1,5 +1,6 @@
 #include <fstream>
 #include "nmea-adapter.hpp"
+#include "nmea-interpreter.hpp"
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
@@ -31,12 +32,13 @@ unsigned int NMEA_Adapter::strToInt(const char *str, int base)
     return result;
 }
 
-int NMEA_Adapter::readSentence()
+std::string NMEA_Adapter::readSentence()
 {
 	memset(&this->read_buf, '\0', sizeof(this->read_buf));
 	int num_bytes = read(this->spfd, &this->read_buf, sizeof(this->read_buf));
-	std::cout<<this->read_buf<<std::endl;
-	return num_bytes;
+	std::string ret(this->read_buf,sizeof(this->read_buf));
+	//std::cout<<ret<<std::endl;
+	return ret;
 }
 
 int NMEA_Adapter::openUSBSerialPort()
@@ -103,8 +105,14 @@ int main(int argc, char const *argv[])
 	}
 
 	NMEA_Adapter* adapter = new NMEA_Adapter(conffile);
+	NMEA_Interpreter* interpreter = new NMEA_Interpreter();
+	nlohmann::json temp;
 	while(1)
-		adapter->readSentence();
+	{
+		temp = interpreter->convertToJSON(adapter->readSentence());
+		if (temp != NULL)
+			std::cout<<temp<<std::endl;
+	}
 	adapter->cleanUp();
 	return 0;
 }
