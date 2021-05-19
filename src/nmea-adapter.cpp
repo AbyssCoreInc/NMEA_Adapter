@@ -1,5 +1,9 @@
 #include <fstream>
 #include "nmea-adapter.hpp"
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <termios.h>
 
 using json = nlohmann::json;
 
@@ -8,6 +12,10 @@ NMEA_Adapter::NMEA_Adapter(std::string path)
 	std::cout<<" NMEA 0183 Fiware Adapther \n";
 	this->readConfigFile(path);
 	this->openUSBSerialPort();
+	// initialize read buffer
+	char read_buf[256];
+
+	memset(&this->read_buf, '\0', sizeof(this->read_buf));
 }
 
 unsigned int NMEA_Adapter::strToInt(const char *str, int base)
@@ -23,10 +31,18 @@ unsigned int NMEA_Adapter::strToInt(const char *str, int base)
     return result;
 }
 
-
+int NMEA_Adapter::readSentence()
+{
+	memset(&this->read_buf, '\0', sizeof(this->read_buf));
+	int num_bytes = read(this->spfd, &this->read_buf, sizeof(this->read_buf));
+	std::cout<<this->read_buf<<std::endl;
+	return num_bytes;
+}
 
 int NMEA_Adapter::openUSBSerialPort()
 {
+	struct termios options;
+
 	//libusbp::device device = libusbp::find_device_with_vid_pid(0x067b,0x2303);
 	libusbp::device device = libusbp::find_device_with_vid_pid(this->vendor_id, this->product_id);
 	if (!device)
@@ -38,6 +54,20 @@ int NMEA_Adapter::openUSBSerialPort()
 	libusbp::serial_port port(device);
 	std::string port_name = port.get_name();
 	std::cout << port_name << std::endl;
+
+	this->spfd = open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+	if (this->spfd == -1)
+	{
+		// Could not open the port. 
+		perror("open_port: Unable to open /dev/ttyf1 - ");
+		return 2;
+	}
+	fcntl(this->spfd, F_SETFL, 0);
+
+	tcgetattr(this->spfd, &options);
+	cfsetispeed(&options, B4800); // 4800 is the baudrate of NMEA0193
+	options.c_cflag |= (CLOCAL | CREAD);
+	tcsetattr(this->spfd, TCSANOW, &options);
 
 	return 0;
 }
@@ -73,7 +103,14 @@ int main(int argc, char const *argv[])
 	}
 
 	NMEA_Adapter* adapter = new NMEA_Adapter(conffile);
-
-
+	while(1)
+		adapter->readSentence();
+	adapter->cleanUp();
 	return 0;
+}
+
+
+int NMEA_Adapter::cleanUp()
+{
+	close(this->spfd);
 }
