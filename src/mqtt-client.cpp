@@ -78,3 +78,9 @@ void mqtt_client::on_message(const struct mosquitto_message *message)
     }
 }
 
+void mqtt_client::publish_sensor_data(std::string topic, std::string payload)
+{
+	/* Publish the message
+	 */
+	int ret = publish(NULL,topic.c_str(),payload.length(),payload.c_str(),1,false);
+}

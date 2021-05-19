@@ -16,6 +16,10 @@ private:
 	uint16_t product_id = 0x0002;
 	int spfd = 0; // filedescriptor for serial device
 	char read_buf[256];
+	class mqtt_client *iot_client;
+	std::string mqtt_host;
+	std::string mqtt_port;
+	std::string mqtt_clientid;
 
 public:
 	NMEA_Adapter(std::string path);
