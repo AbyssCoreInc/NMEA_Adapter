@@ -13,4 +13,16 @@ generic or proprietary data sources like Victron power systems that use VE.Direc
 
 ## Dependencies
 Following dependencies need to be installed to compile the software
+```
 sudo apt-get install -y nlohmann-json-dev
+
+# libusbp
+sudo apt-get install cmake libudev-dev
+git clone https://github.com/pololu/libusbp.git
+cd libusbp
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
