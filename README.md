@@ -11,3 +11,6 @@ structured in more logical way than simple devices and data they produce. This s
 access to legacy devices that use NMEA0183 protocoll. Other components are build for NMEA2000 devices and other 
 generic or proprietary data sources like Victron power systems that use VE.Direct or CanBUS bus. 
 
+## Dependencies
+Following dependencies need to be installed to compile the software
+sudo apt-get install -y nlohmann-json-dev

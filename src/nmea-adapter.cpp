@@ -1,17 +1,18 @@
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <fstream>
-#include <stdio>
+#include "nmea-adapter.hpp"
 
 using json = nlohmann::json;
 
+NMEA_Adapter::NMEA_Adapter(std::string path)
+{
+	
+}
+
 int NMEA_Adapter::readConfigFile(std::string path)
 {
-	std::ifstream ifs(path);
-	json jf = json::parse(ifs);
-
-	std::string str(R"({"json": "beta"})");
-	json js = json::parse(str);
+	std::ifstream ifs(path.c_str());
+	this->conf = json::parse(ifs);
 }
 
 
@@ -28,8 +29,6 @@ int main(int argc, char const *argv[])
 
 	NMEA_Adapter* adapter = new NMEA_Adapter(conffile);
 
-	int days = j.at("days");
-	std::cout << days <<std::endl;
 
 	return 0;
 }
