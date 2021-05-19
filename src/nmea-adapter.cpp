@@ -5,11 +5,18 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
-
+#include "mqtt-client.hpp"
 using json = nlohmann::json;
 
 NMEA_Adapter::NMEA_Adapter(std::string path)
 {
+	class mqtt_client *iot_client;
+	int rc;
+
+	char client_id[] = CLIENT_ID;
+	char host[] = BROKER_ADDRESS;
+	int port = MQTT_PORT;
+
 	std::cout<<" NMEA 0183 Fiware Adapther \n";
 	this->readConfigFile(path);
 	this->openUSBSerialPort();
@@ -17,6 +24,8 @@ NMEA_Adapter::NMEA_Adapter(std::string path)
 	char read_buf[256];
 
 	memset(&this->read_buf, '\0', sizeof(this->read_buf));
+
+	iot_client = new mqtt_client(client_id, host, port);
 }
 
 unsigned int NMEA_Adapter::strToInt(const char *str, int base)

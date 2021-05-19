@@ -25,4 +25,6 @@ cd build
 cmake ..
 make
 sudo make install
+
+sudo apt-get install libmosquitto-dev libmosquittopp-dev libssl-dev
 ```
