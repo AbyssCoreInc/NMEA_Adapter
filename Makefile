@@ -34,6 +34,13 @@ $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c $< -o $@
 
 .PHONY: clean
+install:
+	cp build/nmea_adapter /usr/bin/
+	cp nmea_adapter.service /etc/systemd/system/
+	cp nmea_adapter.conf-default /etc/nmea_adapter.conf
+	systemctl daemon-reload
+	systemctl enable nmea_adapter
+	systemctl start nmea_adapter
 clean:
 	rm -r $(BUILD_DIR)
 
