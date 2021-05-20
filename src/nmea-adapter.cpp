@@ -5,29 +5,28 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <termios.h>
+#include <csignal>
 #include "mqtt-client.hpp"
 using json = nlohmann::json;
 
 NMEA_Adapter::NMEA_Adapter(std::string path)
 {
-	int rc;
 	this->mqtt_clientid = "1";
 	std::cout<<" NMEA 0183 Fiware Adapther \n";
 	this->readConfigFile(path);
 	this->openUSBSerialPort();
 	// initialize read buffer
-	char read_buf[256];
-
 	memset(&this->read_buf, '\0', sizeof(this->read_buf));
-	std::cout<<"init MQTT client"<<std::endl;
-	this->iot_client = new mqtt_client(this->mqtt_clientid.c_str(), this->mqtt_host.c_str(), this->strToInt(this->mqtt_port.c_str(),10));
+
+	//std::cout<<"init MQTT client"<<std::endl;
+	this->iot_client = new mqtt_client(this->mqtt_clientid.c_str(), const_cast<char*>(this->mqtt_host.c_str()), this->strToInt(this->mqtt_port.c_str(),10));
 	std::cout<<"NMEA Adapter ready"<<std::endl;
 }
 
 unsigned int NMEA_Adapter::strToInt(const char *str, int base)
 {
     const char digits[] = "0123456789abcdef";
-    unsigned result = 0;
+    unsigned int result = 0;
 
     while(*str)
     {
@@ -95,6 +94,8 @@ int NMEA_Adapter::readConfigFile(std::string path)
 	this->mqtt_port = this->conf["mqtt_port"];
 	this->vendor_id = this->strToInt(s_vid.c_str(),16);
 	this->product_id = this->strToInt(s_pid.c_str(),16);
+
+	return 0;
 }
 
 void NMEA_Adapter::sendMQTTPacket(nlohmann::json data)
@@ -111,10 +112,21 @@ void NMEA_Adapter::sendMQTTPacket(nlohmann::json data)
 	this->iot_client->publish_sensor_data(topic, data.dump());
 }
 
+/**
+* This is global for cleanup function
+*/
+NMEA_Adapter* adapter;
+
+void signalHandler( int signum ) {
+	std::cout << "Interrupt signal (" << signum << ") received.\n";
+	delete adapter;
+	exit(signum);  
+}
+
 int main(int argc, char const *argv[])
 {
 	std::string conffile = "/etc/nmea_adapter.conf";
-
+	signal(SIGINT, signalHandler);
 	// read in the json file
 	if (argc > 1)
 	{
@@ -123,7 +135,7 @@ int main(int argc, char const *argv[])
 			conffile = argv[2];
 	}
 
-	NMEA_Adapter* adapter = new NMEA_Adapter(conffile);
+	adapter = new NMEA_Adapter(conffile);
 	NMEA_Interpreter* interpreter = new NMEA_Interpreter();
 
 	nlohmann::json temp;
@@ -145,4 +157,5 @@ int main(int argc, char const *argv[])
 int NMEA_Adapter::cleanUp()
 {
 	close(this->spfd);
+	return 0;
 }

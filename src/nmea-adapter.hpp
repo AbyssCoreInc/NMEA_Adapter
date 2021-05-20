@@ -1,8 +1,6 @@
 #ifndef NMEA_ADAPTER_HPP
 #define NMEA_ADAPTER_HPP
 
-#define _GLIBCXX_USE_CXX11_ABI 0
-
 #include <nlohmann/json.hpp>
 #include <libusbp.hpp>
 #include <iostream>
