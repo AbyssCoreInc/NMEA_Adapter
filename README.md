@@ -32,7 +32,7 @@ Obviously you need to have MQTT broker such as Mosquitto installed on the machin
 ## Installation
 Installation follows basic route except is much simpler
 ```
-git clone 
+git clone https://github.com/AbyssCoreInc/NMEA_Adapter.git
 cd NMEA_Adapter
 make
 sudo make install
