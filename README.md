@@ -28,3 +28,22 @@ sudo make install
 
 sudo apt-get install libmosquitto-dev libmosquittopp-dev libssl-dev
 ```
+Obviously you need to have MQTT broker such as Mosquitto installed on the machine where messages are published
+## Installation
+Installation follows basic route except is much simpler
+```
+git clone 
+cd NMEA_Adapter
+make
+sudo make install
+```
+thats it now adapter should be running and passing all NMEA sentences to MQTT broker
+you can verify that with mosquitto_sub tool with command:
+```
+mosquitto_sub -t "#" -h 127.0.0.1 -p 1883 -v
+```
+As a result you should see messages such as:
+```
+/1234/VHW/attrs {"speed_knots":"0.0"}
+```
+
