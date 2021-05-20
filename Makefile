@@ -23,7 +23,7 @@ LDFLAGS := -lstdc++ -lusbp-1 -lmosquittopp
 
 # The -MMD and -MP flags together generate Makefiles for us!
 # These files will have .d instead of .o as the output.
-CPPFLAGS := $(INC_FLAGS) -MMD -MP
+CPPFLAGS := $(INC_FLAGS) -MMD -MP -Wno-psabi
 
 
 $(BUILD_DIR)/$(TARGET_EXEC): $(OBJS)
