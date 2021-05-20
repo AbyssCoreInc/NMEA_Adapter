@@ -26,6 +26,7 @@ public:
 	int readConfigFile(std::string path);
 	int openUSBSerialPort();
 	std::string readSentence();
+	void sendMQTTPacket(nlohmann::json data);
 	unsigned int strToInt(const char *str, int base);
 	int cleanUp();
 };

@@ -1,4 +1,10 @@
 {
-	"vendor_id":"",
-	"product_id":"",
+	"vendor_id":"067b",
+	"product_id":"2303",
+	"mqtt_host":"127.0.0.1",
+	"mqtt_port":"1883",
+	"mqtt_user":"",
+	"mqtt_pass":"",
+	"fiware_service":"nmea0183",
+	"api_key":"1234"
 }

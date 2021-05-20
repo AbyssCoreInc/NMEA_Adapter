@@ -11,7 +11,7 @@ using json = nlohmann::json;
 NMEA_Adapter::NMEA_Adapter(std::string path)
 {
 	int rc;
-
+	this->mqtt_clientid = "1";
 	std::cout<<" NMEA 0183 Fiware Adapther \n";
 	this->readConfigFile(path);
 	this->openUSBSerialPort();
@@ -19,7 +19,9 @@ NMEA_Adapter::NMEA_Adapter(std::string path)
 	char read_buf[256];
 
 	memset(&this->read_buf, '\0', sizeof(this->read_buf));
+	std::cout<<"init MQTT client"<<std::endl;
 	this->iot_client = new mqtt_client(this->mqtt_clientid.c_str(), this->mqtt_host.c_str(), this->strToInt(this->mqtt_port.c_str(),10));
+	std::cout<<"NMEA Adapter ready"<<std::endl;
 }
 
 unsigned int NMEA_Adapter::strToInt(const char *str, int base)
@@ -40,7 +42,6 @@ std::string NMEA_Adapter::readSentence()
 	memset(&this->read_buf, '\0', sizeof(this->read_buf));
 	int num_bytes = read(this->spfd, &this->read_buf, sizeof(this->read_buf));
 	std::string ret(this->read_buf,sizeof(this->read_buf));
-	//std::cout<<ret<<std::endl;
 	return ret;
 }
 
@@ -96,6 +97,19 @@ int NMEA_Adapter::readConfigFile(std::string path)
 	this->product_id = this->strToInt(s_pid.c_str(),16);
 }
 
+void NMEA_Adapter::sendMQTTPacket(nlohmann::json data)
+{
+	std::string topic = "/";
+	topic.append(this->conf["api_key"]);
+	topic.append("/");
+	topic.append(data["sentence"]);
+	topic.append("/attrs");
+	std::cout<<"topic: "<<topic<<std::endl;
+	data.erase("sentence");
+	data.erase("source"); // WTF I shoudl do with this field is there a situation that there might be same sentence from two different devices?! 
+	std::cout<<"data: "<<data<<std::endl;
+	this->iot_client->publish_sensor_data(topic, data.dump());
+}
 
 int main(int argc, char const *argv[])
 {
@@ -111,12 +125,17 @@ int main(int argc, char const *argv[])
 
 	NMEA_Adapter* adapter = new NMEA_Adapter(conffile);
 	NMEA_Interpreter* interpreter = new NMEA_Interpreter();
+
 	nlohmann::json temp;
 	while(1)
 	{
+		//std::cout<<"read next sentence"<<std::endl;
 		temp = interpreter->convertToJSON(adapter->readSentence());
 		if (temp != NULL)
-			std::cout<<temp<<std::endl;
+		{
+			std::cout<<"send data:"<<temp<<std::endl;
+			adapter->sendMQTTPacket(temp);
+		}
 	}
 	adapter->cleanUp();
 	return 0;

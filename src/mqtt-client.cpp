@@ -7,8 +7,9 @@
 
 mqtt_client::mqtt_client(const char *id, const char *host, int port) : mosquittopp(id)
 {
-    int keepalive = DEFAULT_KEEP_ALIVE;
-    connect(host, port, keepalive);
+	int keepalive = DEFAULT_KEEP_ALIVE;
+	std::cout<<"MQTT Client connect to: "<<host<<":"<<port<<std::endl;
+	connect(host, port, keepalive);
 }
 
 mqtt_client::~mqtt_client()
