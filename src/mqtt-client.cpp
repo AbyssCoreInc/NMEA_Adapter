@@ -14,14 +14,16 @@ mqtt_client::mqtt_client(const char *id, char *host, int port) : mosquittopp(id)
 	this->port = port;
 	//connect(host, port, keepalive);
 	connect_async(this->host, this->port, keepalive);
-	if (loop_start() != MOSQ_ERR_SUCCESS) {
-		std::cout << "loop_start failed" << std::endl;
-	}
+//	if (loop_start() != MOSQ_ERR_SUCCESS) {
+//		std::cout << "loop_start failed" << std::endl;
+//	}
 }
 
 mqtt_client::~mqtt_client()
 {
 	disconnect();
+	loop_stop();
+	mosqpp::lib_cleanup();
 }
 
 void mqtt_client::on_connect(int rc)

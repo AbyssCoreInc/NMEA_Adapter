@@ -10,12 +10,18 @@ nlohmann::json NMEA_Interpreter::convertToJSON(std::string data)
 {
 	// determine Sentence type
 	nlohmann::json ret = NULL;
-	std::string source = data.substr(1, 2);
-	std::string type = data.substr(3, 3);
-	std::string payload = data.substr(6, data.find("*")-6);
+	// Find start marker $
+	int s_index = data.find('$');
+	std::cout<<"interpreter starter "<<s_index<<std::endl;
+	int e_index = data.find('*');
+	std::cout<<"interpreter end "<<e_index<<std::endl;
+	std::string temp = data.substr( s_index + 1,e_index-s_index-1 );
+	std::string source = temp.substr(0, 2);
+	std::string type = temp.substr(2, 3);
+	std::string payload = temp.substr(5, temp.length()-5);
 	if (payload.length() < data.length()-15)
 	{
-		//std::cout<<"size:"<<data.length()<<" dev:"<<source<<" type:"<<type<<" data:"<<payload<<std::endl;
+		std::cout<<"size:"<<data.length()<<" dev:"<<source<<" type:"<<type<<" data:"<<payload<<std::endl;
 		if (strcmp(type.c_str(),"DBT") == 0)
 			ret = this->convertSentenceDBT(source,payload);
 		else if (strcmp(type.c_str(),"VHW") == 0)
