@@ -3,7 +3,8 @@
 Purpose of this piece of software is to capture NMEA0183 traffic using serial adapter like that by Brookhouse and
 inject that Fiware using MQTT Ultra Light protocoll. Datamodel for NMEA0183 devices is somethign that is crucial and 
 somewhat use case specific. Simple approach is to have each talker identifier or sentence identifier as its own entity 
-and all datafields as attributes to it.
+and all datafields as attributes to it. Datemodel I have not even started yet, so that is to-be-done.
+NMEA0183 data formats and so one are found from: https://www.tronico.fi/OH6NT/docs/NMEA0183.pdf
 
 ## End Goal
 End goal is to build adapter to OpenCPN that can use Fiware as data source for ship data. To this end data need to be 
@@ -46,4 +47,5 @@ As a result you should see messages such as:
 ```
 /1234/VHW/attrs {"speed_knots":"0.0"}
 ```
-
+## Next steps
+Propably I am going to ditch the MQTT and push data directly to IoT Agent, that may me more energy efficient and C++ MQTT library seems to be a little unstable. Or more likely that I am using it wrong.
